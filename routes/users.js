@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User');
 const { check, validationResult } = require('express-validator');
-const { findOne } = require('../models/User');
+const bcrypt = require('bcryptjs');
+const User = require('../models/User');
 
 // @route    POST api/users
 // @desc     Signup user
@@ -28,6 +28,12 @@ router.post(
 				return res.status(400).json({ msg: 'User already exist' });
 			}
 			user = new User({ name, email, password });
+
+			const slat = await bcrypt.genSalt(10);
+
+			user.password = await bcrypt.hash(password, salt);
+
+			await user.save();
 		} catch (err) {
 			console.error(err.massage);
 			res.status(500).json({ msg: 'Server error' });
