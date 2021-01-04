@@ -27,13 +27,14 @@ router.post(
 			if (user) {
 				return res.status(400).json({ msg: 'User already exist' });
 			}
+
 			user = new User({ name, email, password });
 
-			const slat = await bcrypt.genSalt(10);
-
+			const salt = await bcrypt.genSalt(10);
 			user.password = await bcrypt.hash(password, salt);
 
 			await user.save();
+			res.send('User saved');
 		} catch (err) {
 			console.error(err.massage);
 			res.status(500).json({ msg: 'Server error' });
