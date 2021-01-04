@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const config = require('config');
 
 const User = require('../models/User');
+const { auth, isAdmin } = require('../middleware/auth');
 
 // @route    POST api/users
 // @desc     Signup user
@@ -36,11 +37,11 @@ router.post(
 			const salt = await bcrypt.genSalt(10);
 			user.password = await bcrypt.hash(password, salt);
 
+			await user.save();
+
 			const payload = {
-				user: {
-					id: user._id,
-					isAdmin: user.isAdmin,
-				},
+				id: user._id,
+				isAdmin: user.isAdmin,
 			};
 
 			jwt.sign(payload, config.get('jwtSecret'), { expiresIn: 360000 }, (err, token) => {
